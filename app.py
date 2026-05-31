@@ -257,80 +257,26 @@ Return in structured format.
         st.error("Please Upload Your Resume and Job Description")
 # Sidebar Instructions
 with st.sidebar:
-    st.title("📋 How to Use")
-
     st.markdown("""
-## 🚀 AI Interview Coach Guide
+### 🚀 Quick Guide
+**1️⃣ Resume upload karo** (PDF)
+**2️⃣ Job description paste karo**
+**3️⃣ "Record Your AI Interview" click karo**  
+→ AI 10 questions banayega
+**4️⃣ Answer bolo mic se record karke**
+**5️⃣ "Save Recorded Answer" dabao**  
+→ AI answer check karega
+**6️⃣ Feedback milega**
+- Technical score
+- Communication score
+- Confidence score
+**7️⃣ "Next Question" se aage badho**
+**8️⃣ End me final score milega**
 
 ---
 
-### 📌 Step 1: Upload Resume
-Upload your **PDF Resume**
-
----
-
-### 📌 Step 2: Enter Job Description
-Paste the **Job Description (JD)** you want to prepare for
-
----
-
-### 📌 Step 3: Generate Interview
-Click **"Record Your AI Interview"**
-
-✔ AI will:
-- Extract skills & projects from resume  
-- Match resume with JD  
-- Generate 10 interview questions  
-
----
-
-### 📌 Step 4: Start Interview
-- Camera will open (for monitoring only)
-- Use microphone to record your answer
-
----
-
-### 📌 Step 5: Save Answer
-Click **"Save Recorded Answer"**
-
-✔ AI will:
-- Convert speech → text (Whisper AI)  
-- Evaluate your response  
-
----
-
-### 📌 Step 6: Get Feedback
-You will receive:
-- 🎯 Technical Score  
-- 🗣 Communication Score  
-- 💡 Confidence Score  
-- 🧠 Detailed AI Feedback  
-
----
-
-### 📌 Step 7: Next Question
-Click **"Next Question"** to continue interview
-
----
-
-### 📌 Step 8: Complete Interview
-Repeat until all questions are finished
-
----
-
-## 🏁 Final Result
-At the end you get:
-- ⭐ Final Interview Score  
-- 📊 Average Performance Rating  
-
----
-
-## 📄 Resume Analysis Mode
-Click **"Analyze Resume"**
-
-You will get:
-- Skills Extraction  
-- Projects Overview  
-- Experience Summary  
-- Education Details  
-""",unsafe_allow_html=True)
+### 📄 Resume Check
+"Analyze Resume" click karo:
+skills, projects, experience aur education mil jayega
+"""
+,unsafe_allow_html=True)

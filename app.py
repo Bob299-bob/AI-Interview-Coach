@@ -260,17 +260,24 @@ with st.sidebar:
     st.markdown("""
 ### 🚀 Quick Guide
 **1️⃣ Resume upload karo** (PDF)
+
 **2️⃣ Job description paste karo**
+
 **3️⃣ "Record Your AI Interview" click karo**  
 → AI 10 questions banayega
+
 **4️⃣ Answer bolo mic se record karke**
+
 **5️⃣ "Save Recorded Answer" dabao**  
 → AI answer check karega
+
 **6️⃣ Feedback milega**
 - Technical score
 - Communication score
 - Confidence score
+
 **7️⃣ "Next Question" se aage badho**
+
 **8️⃣ End me final score milega**
 
 ---

@@ -8,8 +8,8 @@ import re
 from dotenv import load_dotenv
 # to access camera and audio
 from streamlit_webrtc import webrtc_streamer
-import speech_recognition as sr
-
+from streamlit_mic_recorder import mic_recorder
+import tempfile
 load_dotenv()
 #Page Description
 st.set_page_config(page_title="AI Interview Coach",layout="wide")
@@ -69,17 +69,18 @@ with col1:
 with col2:
     query = st.text_area("Enter Your Job Description",height=150)
 # Speech to Text function
-def speech_to_text():
-    recognizer = sr.Recognizer()
-    with sr.Microphone() as source:
-        st.info("Listening...")
-        recognizer.adjust_for_ambient_noise(source)
-        audio = recognizer.listen(source,timeout=5,phrase_time_limit=60)
-    try:
-        text = recognizer.recognize_google(audio)
-        return text
-    except:
-        return ""
+def transcribe_audio(audio_bytes):
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
+        tmp.write(audio_bytes)
+        tmp_path = tmp.name
+
+    with open(tmp_path, "rb") as file:
+        transcription = client.audio.transcriptions.create(
+            file=file,
+            model="whisper-large-v3"
+        )
+
+    return transcription.text
 # Generate Questions
 if st.button("Record Your AI Interview"):
         st.session_state.page = "interview"
@@ -127,44 +128,80 @@ Rules:
         else:
             st.error("Please Upload Resume and Enter Job Description")
 # Interview Section
-if (st.session_state.page == "interview" and st.session_state.questions and st.session_state.qno < len(st.session_state.questions)):
+if (st.session_state.page == "interview"
+    and st.session_state.questions
+    and st.session_state.qno < len(st.session_state.questions)):
+
     current_question = st.session_state.questions[st.session_state.qno]
+
     left_col, right_col = st.columns(2)
+
     with left_col:
         st.markdown(
-        f"""
-        <div style="
-            background:white;
-            height:350px;
-            padding:20px;
-            border-radius:15px;
-            color:black;
-            font-size:22px;
-            box-shadow:0px 4px 10px rgba(0,0,0,0.2);
-            overflow-y:auto;
-        ">
-            <h3>Question {st.session_state.qno + 1}</h3>
-            <p>{current_question}</p>
-        </div>
-        """,unsafe_allow_html=True)
+            f"""
+            <div style="
+                background:white;
+                height:350px;
+                padding:20px;
+                border-radius:15px;
+                color:black;
+                font-size:22px;
+                box-shadow:0px 4px 10px rgba(0,0,0,0.2);
+                overflow-y:auto;
+            ">
+                <h3>Question {st.session_state.qno + 1}</h3>
+                <p>{current_question}</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
     with right_col:
-        webrtc_streamer(key="camera",media_stream_constraints={"video": True,"audio": False})
-    # Record Answer
+        webrtc_streamer(
+            key="camera",
+            media_stream_constraints={
+                "video": True,
+                "audio": True
+            }
+        )
+
+    st.subheader("🎤 Record Your Answer")
+
+    audio = mic_recorder(
+        start_prompt="🎤 Start Recording",
+        stop_prompt="⏹ Stop Recording",
+        key=f"audio_{st.session_state.qno}"
+    )
+
     col1, col2 = st.columns(2)
+
     with col1:
-        record_btn = st.button("Record Answer",use_container_width=True)
+        submit_answer = st.button(
+            "Submit Answer",
+            use_container_width=True
+        )
+
     with col2:
-        next_btn = st.button("Next Question",use_container_width=True)
-    if record_btn:
-        timer_placeholder = st.empty()
-        for i in range(5, 0, -1):   # 5 second timer
-            timer_placeholder.info(f"🎤 Recording starts in... {i}s")
-            time.sleep(1)
-        answer = speech_to_text()
-        if answer:
+        next_btn = st.button(
+            "Next Question",
+            use_container_width=True
+        )
+
+    if submit_answer:
+
+        if audio:
+
+            with st.spinner("Transcribing Audio..."):
+
+                answer = transcribe_audio(
+                    audio["bytes"]
+                )
+
             st.session_state.answer = answer
+
             st.write("### Your Answer")
             st.write(answer)
+
             evaluation_prompt = f"""
 Question:
 {current_question}
@@ -183,37 +220,79 @@ Strengths:
 Areas for Improvement:
 """
 
-            evaluation = client.chat.completions.create(model="llama-3.1-8b-instant",
-                                                    temperature=0.3,
-                                                    messages=[{"role": "user",
-                                                               "content": evaluation_prompt}])
-            st.write("AI Feedback")
-            feedback=evaluation.choices[0].message.content
-            st.write(evaluation.choices[0].message.content)
-            timer_placeholder.success("Recording Completed")
-            technical = re.search(r"Technical Score:\s*(\d+)",feedback)
-            communication = re.search(r"Communication Score:\s*(\d+)",feedback)
-            confidence = re.search(r"Confidence Score:\s*(\d+)",feedback)
+            evaluation = client.chat.completions.create(
+                model="llama-3.1-8b-instant",
+                temperature=0.3,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": evaluation_prompt
+                    }
+                ]
+            )
+
+            feedback = evaluation.choices[0].message.content
+
+            st.write("## AI Feedback")
+            st.write(feedback)
+
+            technical = re.search(
+                r"Technical Score:\s*(\d+)",
+                feedback
+            )
+
+            communication = re.search(
+                r"Communication Score:\s*(\d+)",
+                feedback
+            )
+
+            confidence = re.search(
+                r"Confidence Score:\s*(\d+)",
+                feedback
+            )
+
             if technical and communication and confidence:
+
                 tech = int(technical.group(1))
                 comm = int(communication.group(1))
                 conf = int(confidence.group(1))
+
                 overall = (tech + comm + conf) / 3
+
                 st.session_state.scores.append(overall)
-                st.metric("Current Score",f"{overall:.1f}/10")
+
+                st.metric(
+                    "Current Score",
+                    f"{overall:.1f}/10"
+                )
+
         else:
-            st.warning("No voice detected")
-    # Next Question
+            st.warning(
+                "Please record your answer first."
+            )
+
     if next_btn:
-        if (st.session_state.qno< len(st.session_state.questions) - 1):
+
+        if st.session_state.qno < len(st.session_state.questions) - 1:
+
             st.session_state.qno += 1
             st.rerun()
-        else:
-            st.success("Interview Completed!")
-            if st.session_state.scores:
-                final_score = (sum(st.session_state.scores)/ len(st.session_state.scores))
-                st.metric("Final Interview Score",f"{final_score:.1f}/10")
 
+        else:
+
+            st.success("Interview Completed!")
+
+            if st.session_state.scores:
+
+                final_score = (
+                    sum(st.session_state.scores)
+                    / len(st.session_state.scores)
+                )
+
+                st.metric(
+                    "Final Interview Score",
+                    f"{final_score:.1f}/10"
+                )
 # Resume Analysis
 if st.sidebar.button("Analyze Resume"):
     st.session_state.page = "analysis"

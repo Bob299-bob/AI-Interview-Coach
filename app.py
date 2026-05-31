@@ -258,24 +258,25 @@ Return in structured format.
 # Sidebar Instructions
 with st.sidebar:
     st.markdown("""
-### 🚀 Quick Guide
-**1️⃣ Resume upload ** (PDF)
+### Quick Guide
+1️⃣ Upload Resume (PDF)
 
-**2️⃣ Paste Job description **
+2️⃣ Paste Job description 
 
-**3️⃣ "Record Your AI Interview" **  
+3️⃣ Record Your AI Interview   
 
-**4️⃣ Click Start(Camera) and Start Recording(Mic)**
+4️⃣ Click Start(Camera) and Start Recording(Mic)
     -When you will complete your answer
     -Stop Recording
-**5️⃣ "Save Recorded Answer"**
+    
+5️⃣ Save Recorded Answer
 
-**6️⃣ Feedback**
+6️⃣ Feedback
 - Technical score
 - Communication score
 - Confidence score
 
-**7️⃣ "Next Question"**
+7️⃣ Next Question
 
 ---
 

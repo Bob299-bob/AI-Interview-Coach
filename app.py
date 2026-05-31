@@ -259,31 +259,25 @@ Return in structured format.
 with st.sidebar:
     st.markdown("""
 ### 🚀 Quick Guide
-**1️⃣ Resume upload karo** (PDF)
+**1️⃣ Resume upload ** (PDF)
 
-**2️⃣ Job description paste karo**
+**2️⃣ Paste Job description **
 
-**3️⃣ "Record Your AI Interview" click karo**  
-→ AI 10 questions banayega
+**3️⃣ "Record Your AI Interview" **  
 
-**4️⃣ Answer bolo mic se record karke**
+**4️⃣ Click Start(Camera) and Start Recording(Mic)**
+    -When you will complete your answer
+    -Stop Recording
+**5️⃣ "Save Recorded Answer"**
 
-**5️⃣ "Save Recorded Answer" dabao**  
-→ AI answer check karega
-
-**6️⃣ Feedback milega**
+**6️⃣ Feedback**
 - Technical score
 - Communication score
 - Confidence score
 
-**7️⃣ "Next Question" se aage badho**
-
-**8️⃣ End me final score milega**
+**7️⃣ "Next Question"**
 
 ---
 
-### 📄 Resume Check
-"Analyze Resume" click karo:
-skills, projects, experience aur education mil jayega
 """
 ,unsafe_allow_html=True)

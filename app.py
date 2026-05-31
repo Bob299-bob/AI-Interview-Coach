@@ -70,17 +70,35 @@ with col2:
     query = st.text_area("Enter Your Job Description",height=150)
 # Speech to Text function
 def transcribe_audio(audio_bytes):
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
+
+    with tempfile.NamedTemporaryFile(
+        delete=False,
+        suffix=".wav"
+    ) as tmp:
+
         tmp.write(audio_bytes)
         tmp_path = tmp.name
 
-    with open(tmp_path, "rb") as file:
-        transcription = client.audio.transcriptions.create(
-            file=file,
-            model="whisper-large-v3"
-        )
+    try:
 
-    return transcription.text
+        with open(tmp_path, "rb") as file:
+
+            transcription = client.audio.transcriptions.create(
+                file=(tmp_path, file.read()),
+                model="whisper-large-v3-turbo"
+            )
+
+        return transcription.text
+
+    except Exception as e:
+
+        st.error(f"Transcription Error: {e}")
+        return ""
+
+    finally:
+
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
 # Generate Questions
 if st.button("Record Your AI Interview"):
         st.session_state.page = "interview"

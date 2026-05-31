@@ -8,7 +8,6 @@ import re
 from dotenv import load_dotenv
 # to access camera and audio
 from streamlit_webrtc import webrtc_streamer
-import speech_recognition as sr
 
 load_dotenv()
 #Page Description
@@ -50,6 +49,8 @@ video {
 </style>
 """, unsafe_allow_html=True)
 # Session States
+if "audio_data" not in st.session_state:
+    st.session_state.audio_data = None
 if "questions" not in st.session_state:
     st.session_state.questions = []
 if "qno" not in st.session_state:
@@ -68,18 +69,11 @@ with col1:
     data_path = st.file_uploader("Upload Your Resume",type=["pdf"])
 with col2:
     query = st.text_area("Enter Your Job Description",height=150)
+
 # Speech to Text function
-def speech_to_text():
-    recognizer = sr.Recognizer()
-    with sr.Microphone() as source:
-        st.info("Listening...")
-        recognizer.adjust_for_ambient_noise(source)
-        audio = recognizer.listen(source,timeout=5,phrase_time_limit=60)
-    try:
-        text = recognizer.recognize_google(audio)
-        return text
-    except:
-        return ""
+from streamlit_mic_recorder import mic_recorder
+import tempfile
+
 # Generate Questions
 if st.button("Record Your AI Interview"):
         st.session_state.page = "interview"
@@ -149,6 +143,10 @@ if (st.session_state.page == "interview" and st.session_state.questions and st.s
         """,unsafe_allow_html=True)
     with right_col:
         webrtc_streamer(key="camera",media_stream_constraints={"video": True,"audio": False})
+        audio = mic_recorder(start_prompt="🎤 Start Recording",stop_prompt="⏹ Stop Recording",key=f"mic_{st.session_state.qno}")
+        if audio and "bytes" in audio:
+            st.session_state.audio_data = audio["bytes"]
+            st.success("Audio captured successfully")
     # Record Answer
     col1, col2 = st.columns(2)
     with col1:
@@ -156,16 +154,19 @@ if (st.session_state.page == "interview" and st.session_state.questions and st.s
     with col2:
         next_btn = st.button("Next Question",use_container_width=True)
     if record_btn:
-        timer_placeholder = st.empty()
-        for i in range(5, 0, -1):   # 5 second timer
-            timer_placeholder.info(f"🎤 Recording starts in... {i}s")
-            time.sleep(1)
-        answer = speech_to_text()
-        if answer:
-            st.session_state.answer = answer
-            st.write("### Your Answer")
-            st.write(answer)
-            evaluation_prompt = f"""
+        if not st.session_state.audio_data:
+            st.warning("Please record audio first")
+            st.stop()
+        with tempfile.NamedTemporaryFile(delete=False,suffix=".wav") as tmp:
+                tmp.write(st.session_state.audio_data)
+                audio_path = tmp.name
+        with open(audio_path, "rb") as file:
+                transcript = client.audio.transcriptions.create(file=file,model="whisper-large-v3")
+        answer = transcript.text
+        st.session_state.answer = answer
+        st.write("### Your Answer")
+        st.write(answer)
+        evaluation_prompt = f"""
 Question:
 {current_question}
 
@@ -183,18 +184,17 @@ Strengths:
 Areas for Improvement:
 """
 
-            evaluation = client.chat.completions.create(model="llama-3.1-8b-instant",
+        evaluation = client.chat.completions.create(model="llama-3.1-8b-instant",
                                                     temperature=0.3,
                                                     messages=[{"role": "user",
                                                                "content": evaluation_prompt}])
-            st.write("AI Feedback")
-            feedback=evaluation.choices[0].message.content
-            st.write(evaluation.choices[0].message.content)
-            timer_placeholder.success("Recording Completed")
-            technical = re.search(r"Technical Score:\s*(\d+)",feedback)
-            communication = re.search(r"Communication Score:\s*(\d+)",feedback)
-            confidence = re.search(r"Confidence Score:\s*(\d+)",feedback)
-            if technical and communication and confidence:
+        st.write("AI Feedback")
+        feedback=evaluation.choices[0].message.content
+        st.write(evaluation.choices[0].message.content)
+        technical = re.search(r"Technical Score:\s*(\d+)",feedback)
+        communication = re.search(r"Communication Score:\s*(\d+)",feedback)
+        confidence = re.search(r"Confidence Score:\s*(\d+)",feedback)
+        if technical and communication and confidence:
                 tech = int(technical.group(1))
                 comm = int(communication.group(1))
                 conf = int(confidence.group(1))
@@ -205,6 +205,7 @@ Areas for Improvement:
             st.warning("No voice detected")
     # Next Question
     if next_btn:
+        st.session_state.audio_data = None
         if (st.session_state.qno< len(st.session_state.questions) - 1):
             st.session_state.qno += 1
             st.rerun()

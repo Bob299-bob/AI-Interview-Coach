@@ -75,5 +75,3 @@ streamlit run app.py
 This project is open-source and free to use.
 
 ---
-
-If you want, I can also make a **more attractive README with badges, GIF demo, and better UI styling**.

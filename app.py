@@ -254,3 +254,47 @@ Return in structured format.
             st.warning("Resume match score is too low/Please Upgrade your Resume")
     else:
         st.error("Please Upload Your Resume and Job Description")
+# Sidebar Instructions
+with st.sidebar:
+    st.title("📋 How to Use")
+
+    st.markdown("""
+    ### Follow These Steps
+
+    **Step 1️⃣**
+    Upload your Resume (PDF)
+
+    **Step 2️⃣**
+    Paste the Job Description
+
+    **Step 3️⃣**
+    Click **"Record Your AI Interview"**
+
+    **Step 4️⃣**
+    Wait for AI to generate interview questions
+
+    **Step 5️⃣**
+    Click **"Start"** on the camera section
+
+    **Step 6️⃣**
+    Read the question carefully
+
+    **Step 7️⃣**
+    Click **"Record Answer"**
+
+    **Step 8️⃣**
+    Speak your answer clearly
+
+    **Step 9️⃣**
+    Review your AI feedback and score
+
+    **Step 🔟**
+    Click **"Next Question"** to continue
+
+    ### Resume Analysis
+    Click **"Analyze Resume"** for:
+    - Skill Extraction
+    - Project Analysis
+    - Education Details
+    - Experience Summary
+    """,unsafe_allow_html=True)

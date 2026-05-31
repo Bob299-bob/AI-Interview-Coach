@@ -260,42 +260,77 @@ with st.sidebar:
     st.title("📋 How to Use")
 
     st.markdown("""
-    ### Follow These Steps
+## 🚀 AI Interview Coach Guide
 
-    **Step 1️⃣**
-    Upload your Resume (PDF)
+---
 
-    **Step 2️⃣**
-    Paste the Job Description
+### 📌 Step 1: Upload Resume
+Upload your **PDF Resume**
 
-    **Step 3️⃣**
-    Click **"Record Your AI Interview"**
+---
 
-    **Step 4️⃣**
-    Wait for AI to generate interview questions
+### 📌 Step 2: Enter Job Description
+Paste the **Job Description (JD)** you want to prepare for
 
-    **Step 5️⃣**
-    Click **"Start"** on the camera section
+---
 
-    **Step 6️⃣**
-    Read the question carefully
+### 📌 Step 3: Generate Interview
+Click **"Record Your AI Interview"**
 
-    **Step 7️⃣**
-    Click **"Record Answer"**
+✔ AI will:
+- Extract skills & projects from resume  
+- Match resume with JD  
+- Generate 10 interview questions  
 
-    **Step 8️⃣**
-    Speak your answer clearly
+---
 
-    **Step 9️⃣**
-    Review your AI feedback and score
+### 📌 Step 4: Start Interview
+- Camera will open (for monitoring only)
+- Use microphone to record your answer
 
-    **Step 🔟**
-    Click **"Next Question"** to continue
+---
 
-    ### Resume Analysis
-    Click **"Analyze Resume"** for:
-    - Skill Extraction
-    - Project Analysis
-    - Education Details
-    - Experience Summary
-    """,unsafe_allow_html=True)
+### 📌 Step 5: Save Answer
+Click **"Save Recorded Answer"**
+
+✔ AI will:
+- Convert speech → text (Whisper AI)  
+- Evaluate your response  
+
+---
+
+### 📌 Step 6: Get Feedback
+You will receive:
+- 🎯 Technical Score  
+- 🗣 Communication Score  
+- 💡 Confidence Score  
+- 🧠 Detailed AI Feedback  
+
+---
+
+### 📌 Step 7: Next Question
+Click **"Next Question"** to continue interview
+
+---
+
+### 📌 Step 8: Complete Interview
+Repeat until all questions are finished
+
+---
+
+## 🏁 Final Result
+At the end you get:
+- ⭐ Final Interview Score  
+- 📊 Average Performance Rating  
+
+---
+
+## 📄 Resume Analysis Mode
+Click **"Analyze Resume"**
+
+You will get:
+- Skills Extraction  
+- Projects Overview  
+- Experience Summary  
+- Education Details  
+""",unsafe_allow_html=True)
